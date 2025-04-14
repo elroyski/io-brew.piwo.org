@@ -479,8 +479,8 @@ func (h *FermentationHandler) FermentationDetails(c *gin.Context) {
 		"fermentation":  fermentation,
 		"ispindel":      ispindel,
 		"duration":      h.FermentationService.GetFermentationDurationString(fermentation),
-		"hasData":       len(measurementsLast12h) > 0,
-		"measurements":  allMeasurements[:min(len(allMeasurements), 15)], // Pokaż tylko ostatnie 15 pomiarów w tabeli
+		"hasData":       len(allMeasurements) > 0,
+		"measurements":  allMeasurements[:min(len(allMeasurements), 15)],
 		"timestamps":    timestamps,
 		"temperatures":  temperatures,
 		"gravities":     gravities,
@@ -489,7 +489,7 @@ func (h *FermentationHandler) FermentationDetails(c *gin.Context) {
 		"rssi":          rssi,
 		"initialValues": initialValues,
 		"currentValues": currentValues,
-		"canDelete":     !fermentation.IsActive || len(allMeasurements) == 0, // Można usunąć jeśli zakończona lub bez pomiarów
+		"canDelete":     !fermentation.IsActive || len(allMeasurements) == 0,
 		"funcMap":       funcMap,
 	})
 }
