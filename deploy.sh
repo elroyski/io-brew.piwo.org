@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Konfiguracja
-DEVIL_USER="twoj_username"  # Zmień na swojego użytkownika na mydevil.net
-DEVIL_HOST="twoj_username.mydevil.net"  # Zmień na swoją domenę
+DEVIL_USER="piwo"  # Zmień na swojego użytkownika na mydevil.net
+DEVIL_HOST="io-brew.piwo.org"  # Zmień na swoją domenę
 APP_NAME="io-brew"
 REMOTE_DIR="/home/$DEVIL_USER/$APP_NAME"
 
