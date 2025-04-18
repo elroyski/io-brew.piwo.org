@@ -204,10 +204,11 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		user, err = h.userService.GetUserByEmail(userInfo.Email)
 		if err != nil {
 			// Utwórz nowego użytkownika
+			googleID := userInfo.ID // Zapisujemy ID jako zmienną, aby móc przekazać wskaźnik
 			user = &models.User{
 				Name:     userInfo.Name,
 				Email:    userInfo.Email,
-				GoogleID: userInfo.ID,
+				GoogleID: &googleID,
 				Picture:  userInfo.Picture,
 				IsActive: true,
 			}
@@ -219,7 +220,8 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 			}
 		} else {
 			// Połącz istniejące konto z Google
-			user.GoogleID = userInfo.ID
+			googleID := userInfo.ID
+			user.GoogleID = &googleID
 			user.Picture = userInfo.Picture
 			if err := h.userService.UpdateUser(user); err != nil {
 				c.HTML(http.StatusInternalServerError, "login.html", gin.H{
