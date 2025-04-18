@@ -3,7 +3,7 @@
 # Konfiguracja
 DEVIL_USER="twoj_username"  # Zmień na swojego użytkownika na mydevil.net
 DEVIL_HOST="twoj_username.mydevil.net"  # Zmień na swoją domenę
-APP_NAME="ispindel"
+APP_NAME="io-brew"
 REMOTE_DIR="/home/$DEVIL_USER/$APP_NAME"
 
 # Budowanie aplikacji
