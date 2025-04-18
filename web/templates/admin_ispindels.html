@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Urządzenia iSpindel - Panel Administratora - iSpindel.piwo.org</title>
+    <title>Urządzenia io-brew - Panel Administratora - io-brew.piwo.org</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="bg-gray-100 min-h-screen">
     <nav class="bg-blue-600 text-white shadow-md">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <a class="font-bold text-xl" href="/">iSpindel</a>
+            <a class="font-bold text-xl" href="/">io-brew</a>
             <div class="flex items-center space-x-4">
                 <span>Witaj, {{.user.Name}}!</span>
                 <a href="/admin" class="bg-yellow-600 px-2 py-1 rounded text-sm">Panel Admina</a>
@@ -21,7 +21,7 @@
 
     <div class="container mx-auto px-4 py-8">
         <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold">Urządzenia iSpindel w systemie</h1>
+            <h1 class="text-2xl font-bold">Urządzenia io-brew w systemie</h1>
             <a href="/admin" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm">
                 &larr; Powrót do panelu
             </a>
@@ -80,7 +80,7 @@
                         </tr>
                         {{else}}
                         <tr class="border-b border-gray-200">
-                            <td colspan="8" class="py-3 px-6 text-center">Brak zarejestrowanych urządzeń iSpindel</td>
+                            <td colspan="8" class="py-3 px-6 text-center">Brak zarejestrowanych urządzeń io-brew</td>
                         </tr>
                         {{end}}
                     </tbody>
@@ -91,7 +91,7 @@
     
     <footer class="bg-white py-4 mt-8">
         <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-            &copy; 2025 iSpindel.piwo.org - System do monitorowania fermentacji
+            &copy; 2025 io-brew.piwo.org - System do monitorowania fermentacji
         </div>
     </footer>
 </body>
