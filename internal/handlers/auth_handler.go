@@ -310,7 +310,7 @@ func (h *AuthHandler) PiwoCallback(c *gin.Context) {
 			user = &models.User{
 				Name:     userInfo.Name,
 				Email:    userInfo.Email,
-				PiwoID:   userInfo.ID,
+				PiwoID:   &userInfo.ID,
 				Picture:  userInfo.Picture,
 				IsActive: true,
 			}
@@ -322,7 +322,7 @@ func (h *AuthHandler) PiwoCallback(c *gin.Context) {
 			}
 		} else {
 			// Połącz istniejące konto z piwo.org
-			user.PiwoID = userInfo.ID
+			user.PiwoID = &userInfo.ID
 			user.Picture = userInfo.Picture
 			user.IsActive = true // Zawsze aktywuj konto po logowaniu przez piwo.org
 			if err := h.userService.UpdateUser(user); err != nil {
