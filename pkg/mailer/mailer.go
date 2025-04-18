@@ -3,9 +3,9 @@ package mailer
 import (
 	"fmt"
 	"log"
+	"net/smtp"
 	"os"
 	"strconv"
-	"net/smtp"
 )
 
 type EmailConfig struct {
@@ -34,7 +34,7 @@ func InitMailer() {
 // SendActivationEmail wysyła e-mail z linkiem aktywacyjnym
 func SendActivationEmail(to, name, token string) error {
 	subject := "Aktywacja konta iSpindel"
-	
+
 	// Pobierz bazowy URL i wyraźnie go zaloguj
 	baseURL := os.Getenv("APP_URL")
 	if baseURL == "" {
@@ -43,10 +43,10 @@ func SendActivationEmail(to, name, token string) error {
 	} else {
 		log.Printf("Używam zmiennej APP_URL: %s", baseURL)
 	}
-	
+
 	activationURL := fmt.Sprintf("%s/auth/activate?token=%s", baseURL, token)
 	log.Printf("Generuję link aktywacyjny: %s", activationURL)
-	
+
 	body := fmt.Sprintf(`Cześć %s,
 
 Dziękujemy za rejestrację na platformie iSpindel. Aby aktywować swoje konto, kliknij na poniższy link:
@@ -67,7 +67,7 @@ Zespół iSpindel
 // SendPasswordResetEmail wysyła e-mail z linkiem do resetowania hasła
 func SendPasswordResetEmail(to, name, token string) error {
 	subject := "Reset hasła iSpindel"
-	
+
 	// Pobierz bazowy URL i wyraźnie go zaloguj
 	baseURL := os.Getenv("APP_URL")
 	if baseURL == "" {
@@ -76,10 +76,10 @@ func SendPasswordResetEmail(to, name, token string) error {
 	} else {
 		log.Printf("Używam zmiennej APP_URL: %s", baseURL)
 	}
-	
+
 	resetURL := fmt.Sprintf("%s/auth/reset-password?token=%s", baseURL, token)
 	log.Printf("Generuję link do resetowania hasła: %s", resetURL)
-	
+
 	body := fmt.Sprintf(`Cześć %s,
 
 Otrzymaliśmy prośbę o zresetowanie hasła na platformie iSpindel. Aby zresetować hasło, kliknij na poniższy link:
@@ -94,6 +94,11 @@ Pozdrawiamy,
 Zespół iSpindel
 `, name, resetURL)
 
+	return sendEmail(to, subject, body)
+}
+
+// SendEmail wysyła e-mail z określonym tematem i treścią
+func SendEmail(to, subject, body string) error {
 	return sendEmail(to, subject, body)
 }
 
@@ -147,4 +152,4 @@ func getEnvIntOrDefault(key string, defaultValue int) int {
 		}
 	}
 	return defaultValue
-} 
+}

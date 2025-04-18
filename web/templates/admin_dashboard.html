@@ -83,13 +83,13 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-yellow-700">System</p>
-                            <p class="text-3xl font-bold text-yellow-800">Aktywny</p>
+                            <p class="text-3xl font-bold text-yellow-800">{{if .systemActive}}Aktywny{{else}}Nieaktywny{{end}}</p>
                         </div>
                         <div class="bg-yellow-200 p-3 rounded-full">
                             <i class="fas fa-server text-yellow-600"></i>
                         </div>
                     </div>
-                    <p class="text-sm text-yellow-600 mt-2">Status platformy</p>
+                    <p class="text-sm text-yellow-600 mt-2">Status platformy: {{.systemVersion}}</p>
                 </div>
             </div>
         </div>

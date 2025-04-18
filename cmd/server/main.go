@@ -10,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"ispindel.piwo.org/internal/handlers"
-	"ispindel.piwo.org/internal/models"
 	"ispindel.piwo.org/internal/services"
 	"ispindel.piwo.org/pkg/auth"
 	"ispindel.piwo.org/pkg/database"
@@ -104,6 +103,8 @@ func main() {
 	fermentationHandler := handlers.NewFermentationHandler()
 	settingsHandler := handlers.NewSettingsHandler()
 	adminHandler := handlers.NewAdminHandler(userService, ispindelService, fermentationService)
+	dashboardHandler := handlers.NewDashboardHandler(ispindelService, fermentationService)
+	contactHandler := handlers.NewContactHandler()
 
 	// Użyj middleware'a dla wszystkich routów
 	r.Use(authMiddleware)
@@ -179,22 +180,9 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
-	// Panel główny (chroniony)
+	// Trasa dla głównego dashboard
 	r.GET("/dashboard", func(c *gin.Context) {
-		user, exists := c.Get("user")
-		if !exists {
-			c.Redirect(http.StatusSeeOther, "/auth/login")
-			return
-		}
-
-		// Sprawdzenie czy użytkownik jest administratorem
-		userModel := user.(*models.User)
-		isAdmin := userModel.Email == adminHandler.AdminEmail
-
-		c.HTML(http.StatusOK, "dashboard.html", gin.H{
-			"user":    user,
-			"isAdmin": isAdmin,
-		})
+		dashboardHandler.Dashboard(c)
 	})
 
 	// Ustawienia konta i systemu (chronione)
@@ -226,6 +214,10 @@ func main() {
 		admin.POST("/ispindels/:id/delete", adminHandler.AdminDeleteIspindel)
 		admin.POST("/users/:id/delete", adminHandler.AdminDeleteUser)
 	}
+
+	// Trasy dla formularza kontaktowego
+	protected := r.Group("/contact")
+	protected.POST("/send", contactHandler.SendMessage)
 
 	// Pobierz port z zmiennej środowiskowej lub ustaw domyślną wartość
 	port := os.Getenv("PORT")
