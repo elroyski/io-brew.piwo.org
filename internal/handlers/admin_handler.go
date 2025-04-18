@@ -65,12 +65,18 @@ func (h *AdminHandler) Dashboard(c *gin.Context) {
 	fermentationCount, _ := h.FermentationService.GetFermentationCount()
 	activeUserCount, _ := h.UserService.GetActiveUserCount()
 
+	// Informacje o systemie
+	systemVersion := "1.0.0" // Wersja systemu
+	systemActive := true     // Status aktywności systemu
+
 	c.HTML(http.StatusOK, "admin_dashboard.html", gin.H{
 		"user":              userModel,
 		"userCount":         userCount,
 		"ispindelCount":     ispindelCount,
 		"fermentationCount": fermentationCount,
 		"activeUserCount":   activeUserCount,
+		"systemVersion":     systemVersion,
+		"systemActive":      systemActive,
 		"isAdmin":           true,
 	})
 }
