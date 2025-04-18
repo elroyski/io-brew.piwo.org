@@ -57,7 +57,7 @@ Treść:
 `, userModel.Name, userModel.Email, subject, userDevices, userFermentations, message)
 
 	// Wyślij wiadomość do administratora
-	err := mailer.SendEmail("elroyski@gmail.com", "Zgłoszenie z iSpindel: "+subject, fullMessage)
+	err := mailer.SendEmail("elroyski@gmail.com", "Zgłoszenie z io-brew: "+subject, fullMessage)
 	if err != nil {
 		log.Printf("Błąd wysyłania wiadomości kontaktowej: %v", err)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{

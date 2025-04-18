@@ -23,9 +23,9 @@ func InitMailer() {
 	config = EmailConfig{
 		Host:     getEnvOrDefault("SMTP_HOST", "mail18.mydevil.net"),
 		Port:     getEnvIntOrDefault("SMTP_PORT", 587),
-		Username: getEnvOrDefault("SMTP_USER", "ispindel@piwo.org"),
+		Username: getEnvOrDefault("SMTP_USER", "io-brew@piwo.org"),
 		Password: getEnvOrDefault("SMTP_PASSWORD", "Kochanapysia1"),
-		From:     getEnvOrDefault("SMTP_FROM", "ispindel@piwo.org"),
+		From:     getEnvOrDefault("SMTP_FROM", "io-brew@piwo.org"),
 	}
 
 	log.Printf("Konfiguracja poczty: %s:%d, użytkownik: %s", config.Host, config.Port, config.Username)
@@ -33,12 +33,12 @@ func InitMailer() {
 
 // SendActivationEmail wysyła e-mail z linkiem aktywacyjnym
 func SendActivationEmail(to, name, token string) error {
-	subject := "Aktywacja konta iSpindel"
+	subject := "Aktywacja konta io-brew"
 
 	// Pobierz bazowy URL i wyraźnie go zaloguj
 	baseURL := os.Getenv("APP_URL")
 	if baseURL == "" {
-		baseURL = "https://ispindel.piwo.org"
+		baseURL = "https://io-brew.piwo.org"
 		log.Printf("UWAGA: Zmienna APP_URL nie jest ustawiona. Używam domyślnej wartości: %s", baseURL)
 	} else {
 		log.Printf("Używam zmiennej APP_URL: %s", baseURL)
@@ -49,7 +49,7 @@ func SendActivationEmail(to, name, token string) error {
 
 	body := fmt.Sprintf(`Cześć %s,
 
-Dziękujemy za rejestrację na platformie iSpindel. Aby aktywować swoje konto, kliknij na poniższy link:
+Dziękujemy za rejestrację na platformie io-brew. Aby aktywować swoje konto, kliknij na poniższy link:
 
 %s
 
@@ -58,7 +58,7 @@ Link jest ważny przez 24 godziny.
 Jeśli nie zarejestrowałeś się na naszej platformie, zignoruj tę wiadomość.
 
 Pozdrawiamy,
-Zespół iSpindel
+Zespół io-brew
 `, name, activationURL)
 
 	return sendEmail(to, subject, body)
@@ -66,12 +66,12 @@ Zespół iSpindel
 
 // SendPasswordResetEmail wysyła e-mail z linkiem do resetowania hasła
 func SendPasswordResetEmail(to, name, token string) error {
-	subject := "Reset hasła iSpindel"
+	subject := "Reset hasła io-brew"
 
 	// Pobierz bazowy URL i wyraźnie go zaloguj
 	baseURL := os.Getenv("APP_URL")
 	if baseURL == "" {
-		baseURL = "https://ispindel.piwo.org"
+		baseURL = "https://io-brew.piwo.org"
 		log.Printf("UWAGA: Zmienna APP_URL nie jest ustawiona. Używam domyślnej wartości: %s", baseURL)
 	} else {
 		log.Printf("Używam zmiennej APP_URL: %s", baseURL)
@@ -82,7 +82,7 @@ func SendPasswordResetEmail(to, name, token string) error {
 
 	body := fmt.Sprintf(`Cześć %s,
 
-Otrzymaliśmy prośbę o zresetowanie hasła na platformie iSpindel. Aby zresetować hasło, kliknij na poniższy link:
+Otrzymaliśmy prośbę o zresetowanie hasła na platformie io-brew. Aby zresetować hasło, kliknij na poniższy link:
 
 %s
 
@@ -91,7 +91,7 @@ Link jest ważny przez 1 godzinę.
 Jeśli nie zgłaszałeś prośby o reset hasła, zignoruj tę wiadomość.
 
 Pozdrawiamy,
-Zespół iSpindel
+Zespół io-brew
 `, name, resetURL)
 
 	return sendEmail(to, subject, body)
