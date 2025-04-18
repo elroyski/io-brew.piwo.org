@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ustawienia konta i systemu - io-brew.piwo.org</title>
+    <title>Ustawienia konta i systemu - iSpindel.piwo.org</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <nav class="bg-blue-600 text-white shadow-md">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <a class="font-bold text-xl" href="/">io-brew</a>
+            <a class="font-bold text-xl" href="/">iSpindel</a>
             <div class="flex items-center space-x-4">
                 <span>Witaj, {{.user.Name}}!</span>
                 <a href="/auth/logout" class="hover:text-blue-200">Wyloguj</a>
@@ -99,7 +99,7 @@
                         Spowoduje to usunięcie:
                     </p>
                     <ul class="list-disc list-inside text-red-600 ml-2 mb-4">
-                        <li>Wszystkich Twoich urządzeń iSpindel</li>
+                        <li>Wszystkich Twoich urządzeń io-brew</li>
                         <li>Wszystkich danych fermentacji</li>
                         <li>Wszystkich pomiarów</li>
                         <li>Twojego konta i danych osobowych</li>
@@ -113,6 +113,12 @@
                         <label for="delete_password" class="block text-gray-700 mb-1">Potwierdź hasło</label>
                         <input type="password" id="delete_password" name="password" required
                             class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    {{else}}
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                        <p class="text-yellow-700">
+                            Twoje konto jest połączone z usługą zewnętrzną (Google lub piwo.org). Potwierdź chęć usunięcia konta przyciskiem poniżej.
+                        </p>
                     </div>
                     {{end}}
                     
@@ -128,7 +134,7 @@
     
     <footer class="bg-white py-4 mt-8">
         <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-            &copy; 2025 io-brew.piwo.org - System do monitorowania fermentacji
+            &copy; 2025 iSpindel.piwo.org - System do monitorowania fermentacji
         </div>
     </footer>
 </body>
