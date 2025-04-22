@@ -108,7 +108,7 @@
                 
                 <form id="deleteAccountForm" action="/settings/delete-account" method="POST" class="space-y-4"
                       onsubmit="return confirm('Czy na pewno chcesz usunąć swoje konto? Ta operacja jest nieodwracalna.');">
-                    {{if ne .user.Password ""}}
+                    {{if and (ne .user.Password "") (not .user.GoogleID) (not .user.PiwoID)}}
                     <div>
                         <label for="delete_password" class="block text-gray-700 mb-1">Potwierdź hasło</label>
                         <input type="password" id="delete_password" name="password" required
