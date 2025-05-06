@@ -24,7 +24,7 @@ func NewIspindelService() *IspindelService {
 
 // Generuj unikalny klucz API
 func generateAPIKey() (string, error) {
-	bytes := make([]byte, 16)
+	bytes := make([]byte, 4) // 4 bajty dadzą 8 znaków w formacie hex
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
 	}
