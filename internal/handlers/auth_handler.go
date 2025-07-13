@@ -121,6 +121,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 func (h *AuthHandler) Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "", false, true)
+	ret := c.Query("return")
+	if ret != "" {
+		c.Redirect(http.StatusSeeOther, ret)
+		return
+	}
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
