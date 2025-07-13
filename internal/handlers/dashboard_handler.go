@@ -31,9 +31,9 @@ func (h *DashboardHandler) Dashboard(c *gin.Context) {
 	userModel := user.(*models.User)
 	userID := userModel.ID
 
-	// Sprawdź, czy admin_token istnieje (impersonacja)
+	// Sprawdź, czy admin_token istnieje (impersonacja) i czy aktualny user to NIE admin
 	_, err := c.Cookie("admin_token")
-	isImpersonating := err == nil
+	isImpersonating := err == nil && userModel.Email != "elroyski@gmail.com"
 
 	// Pobierz urządzenia użytkownika
 	userDevices, err := h.IspindelService.GetIspindelsByUserID(userID)
