@@ -78,9 +78,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		registered := c.Query("registered") == "true"
 		activation := c.Query("activation") == "true"
+		impersonationEnded := c.Query("impersonation_ended") == "1"
 		c.HTML(http.StatusOK, "login.html", gin.H{
-			"registered": registered,
-			"activation": activation,
+			"registered":         registered,
+			"activation":         activation,
+			"impersonationEnded": impersonationEnded,
 		})
 		return
 	}

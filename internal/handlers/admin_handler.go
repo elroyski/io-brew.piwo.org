@@ -425,17 +425,9 @@ func (h *AdminHandler) ImpersonateUser(c *gin.Context) {
 
 // ReturnToAdmin pozwala wrócić do konta admina po impersonacji
 func (h *AdminHandler) ReturnToAdmin(c *gin.Context) {
-	adminToken, err := c.Cookie("admin_token")
-	if err != nil {
-		c.Redirect(http.StatusSeeOther, "/auth/login")
-		return
-	}
-	// Najpierw wyczyść token użytkownika
+	// Usuń oba tokeny
 	c.SetCookie("token", "", -1, "/", "", false, true)
-	// Potem ustaw token admina
-	c.SetCookie("token", adminToken, 3600*24, "/", "", false, true)
-	// Usuń tymczasowe ciasteczko (ustaw na pusty string i czas -1)
 	c.SetCookie("admin_token", "", -1, "/", "", false, true)
-	// Przekieruj na logout z powrotem na /admin
-	c.Redirect(http.StatusSeeOther, "/auth/logout?return=/admin")
+	// Przekieruj na stronę logowania z komunikatem
+	c.Redirect(http.StatusSeeOther, "/auth/login?impersonation_ended=1")
 }
