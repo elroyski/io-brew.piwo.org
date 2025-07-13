@@ -112,6 +112,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// DEBUG: logowanie email użytkownika
+	fmt.Printf("[LOGIN DEBUG] Zalogowano jako: %s\n", email)
+
 	// Ustaw token w ciasteczku
 	c.SetCookie("token", token, 3600*24, "/", "", false, true)
 

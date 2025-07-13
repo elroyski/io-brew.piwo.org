@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -41,6 +42,9 @@ func (h *AdminHandler) AdminRequired() gin.HandlerFunc {
 		}
 
 		userModel := user.(*models.User)
+		// DEBUG: logowanie email i statusu
+		fmt.Printf("[ADMIN DEBUG] email: %s, isActive: %v\n", userModel.Email, userModel.IsActive)
+
 		if userModel.Email != h.AdminEmail {
 			c.HTML(http.StatusForbidden, "error.html", gin.H{
 				"error": "Brak uprawnień do tej strony",
