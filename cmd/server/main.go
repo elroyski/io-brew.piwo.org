@@ -215,8 +215,10 @@ func main() {
 		admin.POST("/users/:id/delete", adminHandler.AdminDeleteUser)
 		// Impersonacja użytkownika
 		admin.GET("/impersonate/:id", adminHandler.ImpersonateUser)
-		admin.GET("/impersonate/return", adminHandler.ReturnToAdmin)
 	}
+
+	// Endpoint powrotu z impersonacji (nie wymaga uprawnień admina)
+	r.GET("/impersonate/return", adminHandler.ReturnToAdmin)
 
 	// Trasy dla formularza kontaktowego
 	protected := r.Group("/contact")
