@@ -430,6 +430,7 @@ func (h *AdminHandler) ReturnToAdmin(c *gin.Context) {
 	c.SetCookie("token", adminToken, 3600*24, "/", "", false, true)
 	// Usuń tymczasowe ciasteczko (ustaw na pusty string i czas -1)
 	c.SetCookie("admin_token", "", -1, "/", "", false, true)
-	// Przekieruj na panel admina
-	c.Redirect(http.StatusSeeOther, "/admin")
+	// Wyloguj użytkownika (czyli wyczyść token) i przekieruj na stronę logowania
+	c.SetCookie("token", "", -1, "/", "", false, true)
+	c.Redirect(http.StatusSeeOther, "/auth/login")
 }
