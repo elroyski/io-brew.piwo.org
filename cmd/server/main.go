@@ -213,6 +213,9 @@ func main() {
 		admin.GET("/fermentations", adminHandler.ListFermentations)
 		admin.POST("/ispindels/:id/delete", adminHandler.AdminDeleteIspindel)
 		admin.POST("/users/:id/delete", adminHandler.AdminDeleteUser)
+		// Impersonacja użytkownika
+		admin.GET("/impersonate/:id", adminHandler.ImpersonateUser)
+		admin.GET("/impersonate/return", adminHandler.ReturnToAdmin)
 	}
 
 	// Trasy dla formularza kontaktowego

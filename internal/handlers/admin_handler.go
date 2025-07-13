@@ -367,3 +367,68 @@ func (h *AdminHandler) AdminDeleteUser(c *gin.Context) {
 	// Przekieruj z powrotem do listy użytkowników
 	c.Redirect(http.StatusSeeOther, "/admin/users")
 }
+
+// ImpersonateUser pozwala adminowi zalogować się jako wybrany użytkownik
+func (h *AdminHandler) ImpersonateUser(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/auth/login")
+		return
+	}
+	userModel := user.(*models.User)
+	if userModel.Email != h.AdminEmail {
+		c.HTML(http.StatusForbidden, "error.html", gin.H{
+			"error": "Brak uprawnień do tej funkcji",
+			"user":  userModel,
+		})
+		return
+	}
+	// Pobierz ID użytkownika do impersonacji
+	userIDStr := c.Param("id")
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Nieprawidłowe ID użytkownika",
+			"user":  userModel,
+		})
+		return
+	}
+	impUser, err := h.UserService.GetUser(int64(userID))
+	if err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Nie znaleziono użytkownika",
+			"user":  userModel,
+		})
+		return
+	}
+	// Zapamiętaj token admina w ciasteczku tymczasowym
+	adminToken, err := c.Cookie("token")
+	if err == nil {
+		c.SetCookie("admin_token", adminToken, 3600, "/", "", false, true)
+	}
+	// Wygeneruj token dla użytkownika
+	token, err := h.UserService.LoginAs(impUser)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Nie udało się wygenerować tokena dla użytkownika",
+			"user":  userModel,
+		})
+		return
+	}
+	c.SetCookie("token", token, 3600*24, "/", "", false, true)
+	c.Redirect(http.StatusSeeOther, "/dashboard")
+}
+
+// ReturnToAdmin pozwala wrócić do konta admina po impersonacji
+func (h *AdminHandler) ReturnToAdmin(c *gin.Context) {
+	adminToken, err := c.Cookie("admin_token")
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/auth/login")
+		return
+	}
+	// Przywróć token admina
+	c.SetCookie("token", adminToken, 3600*24, "/", "", false, true)
+	// Usuń tymczasowe ciasteczko
+	c.SetCookie("admin_token", "", -1, "/", "", false, true)
+	c.Redirect(http.StatusSeeOther, "/admin")
+}

@@ -103,6 +103,9 @@
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     {{if ne .Email $.user.Email}}
+                                    <a href="/admin/impersonate/{{.ID}}" class="text-green-600 hover:text-green-900 mr-2" title="Zaloguj się jako użytkownik">
+                                        <i class="fas fa-user-secret"></i>
+                                    </a>
                                     <form method="POST" action="/admin/users/{{.ID}}/delete" onsubmit="return confirm('Czy na pewno chcesz usunąć tego użytkownika?\nTa operacja jest nieodwracalna.');" class="inline">
                                         <button type="submit" class="text-red-600 hover:text-red-900" title="Usuń">
                                             <i class="fas fa-trash"></i>

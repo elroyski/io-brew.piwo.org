@@ -318,3 +318,16 @@ func (s *UserService) GetAllUsers() ([]models.User, error) {
 	}
 	return users, nil
 }
+
+// LoginAs generuje token JWT dla przekazanego użytkownika (impersonacja)
+func (s *UserService) LoginAs(user *models.User) (string, error) {
+	if user == nil {
+		return "", errors.New("brak użytkownika")
+	}
+	// Generuj token JWT
+	token, err := auth.GenerateToken(user.ID)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
