@@ -608,30 +608,37 @@ func (h *FermentationHandler) ShowCharts(c *gin.Context) {
 
 	// Filtruj pomiary w zależności od wybranego okresu
 	var filteredMeasurements []models.Measurement
-	if period != "all" && len(measurements) > 0 {
-		// Oblicz datę początkową na podstawie wybranego okresu
-		now := time.Now()
-		var startDate time.Time
 
-		switch period {
-		case "1d":
-			startDate = now.AddDate(0, 0, -1)
-		case "3d":
-			startDate = now.AddDate(0, 0, -3)
-		case "7d":
-			startDate = now.AddDate(0, 0, -7)
-		default:
-			startDate = time.Time{} // Jeśli nieznany okres, domyślnie wszystkie dane
-		}
-
-		// Filtruj pomiary nowsze niż startDate
-		for _, m := range measurements {
-			if m.Timestamp.After(startDate) || m.Timestamp.Equal(startDate) {
-				filteredMeasurements = append(filteredMeasurements, m)
-			}
-		}
-	} else {
+	// Dla zakończonych fermentacji - zawsze pokaż wszystkie dane od startu do końca
+	if !fermentation.IsActive && fermentation.EndedAt != nil {
 		filteredMeasurements = measurements
+	} else {
+		// Dla aktywnych fermentacji - zastosuj filtry czasowe jak dotychczas
+		if period != "all" && len(measurements) > 0 {
+			// Oblicz datę początkową na podstawie wybranego okresu
+			now := time.Now()
+			var startDate time.Time
+
+			switch period {
+			case "1d":
+				startDate = now.AddDate(0, 0, -1)
+			case "3d":
+				startDate = now.AddDate(0, 0, -3)
+			case "7d":
+				startDate = now.AddDate(0, 0, -7)
+			default:
+				startDate = time.Time{} // Jeśli nieznany okres, domyślnie wszystkie dane
+			}
+
+			// Filtruj pomiary nowsze niż startDate
+			for _, m := range measurements {
+				if m.Timestamp.After(startDate) || m.Timestamp.Equal(startDate) {
+					filteredMeasurements = append(filteredMeasurements, m)
+				}
+			}
+		} else {
+			filteredMeasurements = measurements
+		}
 	}
 
 	// Przygotuj dane do wykresów
