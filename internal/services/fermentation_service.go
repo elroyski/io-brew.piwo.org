@@ -275,9 +275,24 @@ func (s *FermentationService) GetHourlyMeasurementsLast12Hours(fermentationID ui
 	query := database.DB.Model(&models.Measurement{}).
 		Where("ispindel_id = ?", fermentation.IspindelID)
 
+	// Określ punkt odniesienia czasowego w zależności od statusu fermentacji
+	var referenceTime time.Time
+	if !fermentation.IsActive && fermentation.EndedAt != nil {
+		// Dla zakończonych fermentacji - ostatnie 12h przed zakończeniem
+		referenceTime = *fermentation.EndedAt
+	} else {
+		// Dla aktywnych fermentacji - ostatnie 12h od teraz
+		referenceTime = time.Now()
+	}
+
 	// Dodaj warunek na zakres dat - ostatnie 12 godzin
-	twelveHoursAgo := time.Now().Add(-12 * time.Hour)
+	twelveHoursAgo := referenceTime.Add(-12 * time.Hour)
 	query = query.Where("timestamp >= ?", twelveHoursAgo)
+
+	// Dla zakończonych fermentacji dodaj górny limit czasowy
+	if !fermentation.IsActive && fermentation.EndedAt != nil {
+		query = query.Where("timestamp <= ?", fermentation.EndedAt)
+	}
 
 	// Grupuj po godzinie używając składni MySQL
 	query = query.Select("MIN(id) as id").
