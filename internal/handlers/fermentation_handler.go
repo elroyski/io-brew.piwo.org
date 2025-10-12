@@ -561,6 +561,40 @@ func (h *FermentationHandler) DeleteFermentation(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/fermentations")
 }
 
+// ToggleMeasurementHidden ukrywa lub pokazuje pomiar
+func (h *FermentationHandler) ToggleMeasurementHidden(c *gin.Context) {
+	// Pobierz zalogowanego użytkownika
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Wymagane zalogowanie"})
+		return
+	}
+	userModel := user.(*models.User)
+
+	// Pobierz ID fermentacji i ID pomiaru z parametrów URL
+	fermentationID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Nieprawidłowy identyfikator fermentacji"})
+		return
+	}
+
+	measurementID, err := strconv.ParseUint(c.Param("measurement_id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Nieprawidłowy identyfikator pomiaru"})
+		return
+	}
+
+	// Przełącz status ukrycia pomiaru
+	err = h.FermentationService.ToggleMeasurementHidden(uint(measurementID), uint(fermentationID), userModel.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Błąd podczas zmiany statusu pomiaru: " + err.Error()})
+		return
+	}
+
+	// Zwróć sukces
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
 // ShowCharts wyświetla szczegółowe wykresy dla fermentacji
 func (h *FermentationHandler) ShowCharts(c *gin.Context) {
 	// Pobierz ID fermentacji z parametrów URL

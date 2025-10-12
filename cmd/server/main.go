@@ -160,6 +160,7 @@ func main() {
 		fermentationGroup.GET("/:id/charts", fermentationHandler.ShowCharts)
 		fermentationGroup.POST("/:id/end", fermentationHandler.EndFermentation)
 		fermentationGroup.POST("/:id/delete", fermentationHandler.DeleteFermentation)
+		fermentationGroup.POST("/:id/measurements/:measurement_id/toggle-hidden", fermentationHandler.ToggleMeasurementHidden)
 	}
 
 	// API endpoint dostępny bez autentykacji

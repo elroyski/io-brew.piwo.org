@@ -452,23 +452,37 @@
                                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         RSSI [dBm]
                                     </th>
+                                    <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Akcje
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 text-sm">
                                 {{if .measurements}}
                                     {{range .measurements}}
-                                    <tr>
+                                    <tr id="measurement-{{.ID}}">
                                         <td class="px-3 py-2 whitespace-nowrap">{{.Timestamp.Format "02.01.2006 15:04"}}</td>
                                         <td class="px-3 py-2 whitespace-nowrap">{{printf "%.1f" .Temperature}}°C</td>
                                         <td class="px-3 py-2 whitespace-nowrap">{{printf "%.3f" .Gravity}}</td>
                                         <td class="px-3 py-2 whitespace-nowrap">{{printf "%.1f" .Angle}}°</td>
                                         <td class="px-3 py-2 whitespace-nowrap">{{printf "%.2f" .Battery}}V</td>
                                         <td class="px-3 py-2 whitespace-nowrap">{{.RSSI}} dBm</td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-center">
+                                            <button 
+                                                onclick="toggleMeasurementHidden({{.ID}})" 
+                                                class="text-red-600 hover:text-red-800 focus:outline-none"
+                                                title="Ukryj pomiar (błędny odczyt)"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </td>
                                     </tr>
                                     {{end}}
                                 {{else}}
                                 <tr>
-                                    <td class="px-3 py-2 whitespace-nowrap text-center" colspan="5">
+                                    <td class="px-3 py-2 whitespace-nowrap text-center" colspan="7">
                                         Brak danych pomiarowych
                                     </td>
                                 </tr>
@@ -494,6 +508,42 @@
     </footer>
 
     <script>
+        // Funkcja do ukrywania/pokazywania pomiarów
+        function toggleMeasurementHidden(measurementId) {
+            if (!confirm('Czy na pewno chcesz ukryć ten pomiar? Ukryte pomiary nie będą wpływać na wykresy i obliczenia. Możesz przywrócić pomiar odświeżając stronę lub kontaktując się z administratorem.')) {
+                return;
+            }
+
+            fetch('/fermentations/{{.fermentation.ID}}/measurements/' + measurementId + '/toggle-hidden', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Ukryj wiersz pomiaru z animacją
+                    const row = document.getElementById('measurement-' + measurementId);
+                    if (row) {
+                        row.style.transition = 'opacity 0.3s';
+                        row.style.opacity = '0';
+                        setTimeout(() => {
+                            row.style.display = 'none';
+                            // Pokaż komunikat
+                            alert('Pomiar został ukryty. Odśwież stronę, aby zobaczyć zaktualizowane wykresy.');
+                        }, 300);
+                    }
+                } else {
+                    alert('Wystąpił błąd podczas ukrywania pomiaru: ' + (data.error || 'Nieznany błąd'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Wystąpił błąd podczas ukrywania pomiaru');
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Sprawdź, czy mamy dane
             var hasData = {{if .hasData}}true{{else}}false{{end}};

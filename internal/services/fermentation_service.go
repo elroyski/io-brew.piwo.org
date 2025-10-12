@@ -210,7 +210,7 @@ func (s *FermentationService) GetAllMeasurements(fermentationID uint) ([]models.
 	}
 
 	// Przygotuj zapytanie bazowe
-	query := database.DB.Where("ispindel_id = ?", fermentation.IspindelID)
+	query := database.DB.Where("ispindel_id = ? AND is_hidden = ?", fermentation.IspindelID, false)
 
 	// Dodaj warunek na zakres dat
 	query = query.Where("timestamp >= ?", fermentation.StartedAt)
@@ -242,7 +242,7 @@ func (s *FermentationService) GetMeasurementsLast12Hours(fermentationID uint) ([
 	}
 
 	// Przygotuj zapytanie bazowe
-	query := database.DB.Where("ispindel_id = ?", fermentation.IspindelID)
+	query := database.DB.Where("ispindel_id = ? AND is_hidden = ?", fermentation.IspindelID, false)
 
 	// Dodaj warunek na zakres dat - ostatnie 12 godzin
 	twelveHoursAgo := time.Now().Add(-12 * time.Hour)
@@ -273,7 +273,7 @@ func (s *FermentationService) GetHourlyMeasurementsLast12Hours(fermentationID ui
 
 	// Przygotuj zapytanie bazowe
 	query := database.DB.Model(&models.Measurement{}).
-		Where("ispindel_id = ?", fermentation.IspindelID)
+		Where("ispindel_id = ? AND is_hidden = ?", fermentation.IspindelID, false)
 
 	// Określ punkt odniesienia czasowego w zależności od statusu fermentacji
 	var referenceTime time.Time
@@ -371,12 +371,35 @@ func (s *FermentationService) GetFermentationDurationString(fermentation *models
 	return fmt.Sprintf("%d min", duration.Minutes)
 }
 
-// GetAllMeasurementsChronological pobiera wszystkie pomiary dla fermentacji w kolejności chronologicznej
+// GetAllMeasurementsChronological pobiera wszystkie pomiary dla fermentacji w kolejności chronologicznej (pomija ukryte)
 func (s *FermentationService) GetAllMeasurementsChronological(fermentationID uint) ([]models.Measurement, error) {
-	var measurements []models.Measurement
-	if err := database.DB.Where("fermentation_id = ?", fermentationID).Order("timestamp ASC").Find(&measurements).Error; err != nil {
+	// Najpierw pobierz fermentację, aby uzyskać ispindel_id i zakres dat
+	var fermentation models.Fermentation
+	if err := database.DB.First(&fermentation, fermentationID).Error; err != nil {
 		return nil, err
 	}
+
+	// Jeśli IspindelID jest NULL (urządzenie zostało usunięte), zwróć pustą listę pomiarów
+	if fermentation.IspindelID == nil {
+		return []models.Measurement{}, nil
+	}
+
+	// Przygotuj zapytanie bazowe
+	query := database.DB.Where("ispindel_id = ? AND is_hidden = ?", fermentation.IspindelID, false)
+
+	// Dodaj warunek na zakres dat
+	query = query.Where("timestamp >= ?", fermentation.StartedAt)
+	if !fermentation.IsActive && fermentation.EndedAt != nil {
+		query = query.Where("timestamp <= ?", fermentation.EndedAt)
+	}
+
+	// Pobierz pomiary - sortowanie rosnąco po timestamp (od najstarszych do najnowszych)
+	var measurements []models.Measurement
+	err := query.Order("timestamp ASC").Find(&measurements).Error
+	if err != nil {
+		return nil, err
+	}
+
 	return measurements, nil
 }
 
@@ -400,9 +423,9 @@ func (s *FermentationService) GetInitialMeasurements(fermentationID uint) (float
 		return 0, 0, errors.New("urządzenie pomiarowe zostało usunięte")
 	}
 
-	// Pobierz pierwsze 3 pomiary posortowane rosnąco po timestamp
+	// Pobierz pierwsze 3 pomiary posortowane rosnąco po timestamp (pomijając ukryte)
 	var measurements []models.Measurement
-	err := database.DB.Where("ispindel_id = ? AND timestamp >= ?", fermentation.IspindelID, fermentation.StartedAt).
+	err := database.DB.Where("ispindel_id = ? AND timestamp >= ? AND is_hidden = ?", fermentation.IspindelID, fermentation.StartedAt, false).
 		Order("timestamp ASC").
 		Limit(3).
 		Find(&measurements).Error
@@ -444,6 +467,34 @@ func (s *FermentationService) GetFermentationCount() (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+// ToggleMeasurementHidden przełącza status ukrycia pomiaru (ukrywa lub pokazuje)
+func (s *FermentationService) ToggleMeasurementHidden(measurementID uint, fermentationID uint, userID uint) error {
+	// Najpierw sprawdź, czy fermentacja należy do użytkownika
+	fermentation, err := s.GetFermentation(fermentationID, userID)
+	if err != nil {
+		return err
+	}
+
+	// Pobierz pomiar
+	var measurement models.Measurement
+	if err := database.DB.First(&measurement, measurementID).Error; err != nil {
+		return errors.New("nie znaleziono pomiaru")
+	}
+
+	// Sprawdź, czy pomiar należy do urządzenia powiązanego z fermentacją
+	if fermentation.IspindelID == nil || measurement.IspindelID != *fermentation.IspindelID {
+		return errors.New("pomiar nie należy do tej fermentacji")
+	}
+
+	// Przełącz status ukrycia
+	measurement.IsHidden = !measurement.IsHidden
+	if err := database.DB.Save(&measurement).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetAllFermentations zwraca wszystkie fermentacje w systemie

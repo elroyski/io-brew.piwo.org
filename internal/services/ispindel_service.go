@@ -207,7 +207,7 @@ func (s *IspindelService) IsIspindelActive(ispindel *models.Ispindel) bool {
 // shouldSaveMeasurement sprawdza czy powinniśmy zapisać nowy pomiar
 func (s *IspindelService) shouldSaveMeasurement(ispindelID uint) (bool, error) {
 	var lastMeasurement models.Measurement
-	result := database.DB.Where("ispindel_id = ?", ispindelID).Order("timestamp desc").First(&lastMeasurement)
+	result := database.DB.Where("ispindel_id = ? AND is_hidden = ?", ispindelID, false).Order("timestamp desc").First(&lastMeasurement)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -312,7 +312,7 @@ func (s *IspindelService) SaveMeasurement(ispindelID uint, data map[string]inter
 	return measurement, nil
 }
 
-// GetLatestMeasurements pobiera najnowsze pomiary dla danego urządzenia
+// GetLatestMeasurements pobiera najnowsze pomiary dla danego urządzenia (pomija ukryte)
 func (s *IspindelService) GetLatestMeasurements(ispindelID uint, limit int) ([]models.Measurement, error) {
 	var measurements []models.Measurement
 
@@ -320,7 +320,7 @@ func (s *IspindelService) GetLatestMeasurements(ispindelID uint, limit int) ([]m
 		limit = 10 // Domyślny limit
 	}
 
-	if err := database.DB.Where("ispindel_id = ?", ispindelID).
+	if err := database.DB.Where("ispindel_id = ? AND is_hidden = ?", ispindelID, false).
 		Order("timestamp DESC").
 		Limit(limit).
 		Find(&measurements).Error; err != nil {
@@ -330,7 +330,7 @@ func (s *IspindelService) GetLatestMeasurements(ispindelID uint, limit int) ([]m
 	return measurements, nil
 }
 
-// GetMeasurementsForIspindelInRange pobiera pomiary dla danego urządzenia w określonym zakresie czasowym
+// GetMeasurementsForIspindelInRange pobiera pomiary dla danego urządzenia w określonym zakresie czasowym (pomija ukryte)
 func (s *IspindelService) GetMeasurementsForIspindelInRange(ispindelID uint, startTime, endTime time.Time, limit int) ([]models.Measurement, error) {
 	var measurements []models.Measurement
 
@@ -338,8 +338,8 @@ func (s *IspindelService) GetMeasurementsForIspindelInRange(ispindelID uint, sta
 		limit = 100 // Domyślny limit
 	}
 
-	if err := database.DB.Where("ispindel_id = ? AND timestamp BETWEEN ? AND ?",
-		ispindelID, startTime, endTime).
+	if err := database.DB.Where("ispindel_id = ? AND timestamp BETWEEN ? AND ? AND is_hidden = ?",
+		ispindelID, startTime, endTime, false).
 		Order("timestamp DESC").
 		Limit(limit).
 		Find(&measurements).Error; err != nil {
