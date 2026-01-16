@@ -488,7 +488,7 @@ func (s *FermentationService) ToggleMeasurementHidden(measurementID uint, fermen
 		return errors.New("pomiar nie należy do tej fermentacji")
 	}
 
-	// Przełącz status ukrycia
+	// Przełącz status ukrycia pomiaru
 	measurement.IsHidden = !measurement.IsHidden
 	if err := database.DB.Save(&measurement).Error; err != nil {
 		return err

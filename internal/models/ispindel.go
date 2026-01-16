@@ -36,6 +36,7 @@ type Measurement struct {
 	RSSI        int       `json:"rssi"`
 	Timestamp   time.Time `json:"timestamp"`
 	ReceivedAt  time.Time `json:"received_at"`
+	IsHidden    bool      `gorm:"default:false" json:"is_hidden"` // Czy pomiar jest ukryty (błędne odczyty)
 }
 
 // IsActive sprawdza, czy urządzenie jest aktywne (wysłało dane w ciągu ostatniej godziny)
