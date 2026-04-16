@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"ispindel.piwo.org/internal/handlers"
 	"ispindel.piwo.org/internal/services"
 	"ispindel.piwo.org/pkg/auth"
@@ -20,6 +21,11 @@ import (
 )
 
 func main() {
+	// Załaduj zmienne środowiskowe z pliku .env (jeśli istnieje)
+	if err := godotenv.Load(); err != nil {
+		log.Println("Brak pliku .env, używam zmiennych środowiskowych systemu")
+	}
+
 	// Inicjalizacja bazy danych
 	database.InitDB()
 
