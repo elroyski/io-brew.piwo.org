@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"ispindel.piwo.org/internal/handlers"
@@ -17,7 +15,6 @@ import (
 	"ispindel.piwo.org/pkg/auth"
 	"ispindel.piwo.org/pkg/database"
 	"ispindel.piwo.org/pkg/mailer"
-	"ispindel.piwo.org/pkg/middleware"
 )
 
 func main() {
@@ -109,9 +106,6 @@ func main() {
 		c.Next()
 	}
 
-	// Rate limiter dla rejestracji: max 5 prób per IP na godzinę
-	registerRateLimiter := middleware.NewRateLimiter(5, time.Hour)
-
 	// Inicjalizacja handlerów
 	authHandler := handlers.NewAuthHandler()
 	ispindelHandler := handlers.NewIspindelHandler()
@@ -130,7 +124,7 @@ func main() {
 		auth.GET("/login", authHandler.Login)
 		auth.POST("/login", authHandler.Login)
 		auth.GET("/register", authHandler.Register)
-		auth.POST("/register", registerRateLimiter.RegisterMiddleware(), authHandler.Register)
+		auth.POST("/register", authHandler.Register)
 		auth.GET("/logout", authHandler.Logout)
 		auth.GET("/activate", authHandler.Activate)
 		auth.GET("/resend-activation", func(c *gin.Context) {
