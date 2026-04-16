@@ -8,6 +8,14 @@ import (
 	"strconv"
 )
 
+func mustGetEnv(key string) string {
+	v := os.Getenv(key)
+	if v == "" {
+		log.Fatalf("Wymagana zmienna środowiskowa %s nie jest ustawiona", key)
+	}
+	return v
+}
+
 type EmailConfig struct {
 	Host     string
 	Port     int
@@ -24,7 +32,7 @@ func InitMailer() {
 		Host:     getEnvOrDefault("SMTP_HOST", "mail18.mydevil.net"),
 		Port:     getEnvIntOrDefault("SMTP_PORT", 587),
 		Username: getEnvOrDefault("SMTP_USER", "io-brew@piwo.org"),
-		Password: getEnvOrDefault("SMTP_PASSWORD", "***REMOVED***"),
+		Password: mustGetEnv("SMTP_PASSWORD"),
 		From:     getEnvOrDefault("SMTP_FROM", "io-brew@piwo.org"),
 	}
 

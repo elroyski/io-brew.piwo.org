@@ -26,6 +26,9 @@ func main() {
 	// Inicjalizacja mailera
 	mailer.InitMailer()
 
+	// Inicjalizacja JWT
+	auth.InitJWT()
+
 	// Inicjalizacja Google OAuth
 	auth.InitGoogleOAuth()
 

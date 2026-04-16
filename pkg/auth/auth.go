@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 )
 
 var (
-	jwtSecret         = []byte(getEnvOrDefault("JWT_SECRET", "twoj-tajny-klucz-jwt"))
+	jwtSecret         []byte
 	GoogleOAuthConfig *oauth2.Config
 	PiwoOAuthConfig   *oauth2.Config
 )
@@ -33,6 +34,15 @@ type PiwoUserInfo struct {
 	Email   string `json:"email"`
 	Name    string `json:"name"`
 	Picture string `json:"photo_url"`
+}
+
+// InitJWT inicjalizuje sekret JWT z zmiennej środowiskowej
+func InitJWT() {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Fatal("Wymagana zmienna środowiskowa JWT_SECRET nie jest ustawiona")
+	}
+	jwtSecret = []byte(secret)
 }
 
 // InitGoogleOAuth inicjalizuje konfigurację OAuth2 dla Google
