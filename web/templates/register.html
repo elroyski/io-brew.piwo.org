@@ -56,6 +56,11 @@
                     {{end}}
 
                     <form action="/auth/register" method="POST" class="space-y-4">
+                        <!-- Pole honeypot - niewidoczne dla ludzi, wypełniane przez boty -->
+                        <div style="display:none" aria-hidden="true">
+                            <label for="website">Nie wypełniaj tego pola</label>
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                        </div>
                         <div>
                             <label for="name" class="block text-gray-700 mb-1">Imię</label>
                             <input type="text" id="name" name="name" required

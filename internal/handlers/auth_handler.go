@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,25 @@ import (
 	"ispindel.piwo.org/internal/services"
 	"ispindel.piwo.org/pkg/auth"
 )
+
+// blockedEmailDomains to domeny używane przez boty i serwisy tymczasowe
+var blockedEmailDomains = map[string]bool{
+	"example.com": true,
+	"example.org": true,
+	"example.net": true,
+	"test.com":    true,
+	"mailinator.com": true,
+	"guerrillamail.com": true,
+	"throwam.com": true,
+	"yopmail.com": true,
+	"trashmail.com": true,
+	"fakeinbox.com": true,
+	"tempmail.com": true,
+	"sharklasers.com": true,
+	"guerrillamailblock.com": true,
+}
+
+var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
 
 type AuthHandler struct {
 	userService *services.UserService
@@ -33,10 +53,35 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	password := c.PostForm("password")
 	passwordConfirm := c.PostForm("confirm_password")
 
+	// Sprawdzenie honeypot - boty wypełniają ukryte pole "website", ludzie nie
+	honeypot := c.PostForm("website")
+	if honeypot != "" {
+		// Udajemy sukces, żeby bot nie wiedział że został zablokowany
+		c.Redirect(http.StatusSeeOther, "/auth/login?registered=true")
+		return
+	}
+
 	// Walidacja danych
 	if name == "" || email == "" || password == "" {
 		c.HTML(http.StatusBadRequest, "register.html", gin.H{
 			"error": "Wszystkie pola są wymagane",
+		})
+		return
+	}
+
+	// Walidacja formatu emaila
+	if !emailRegex.MatchString(email) {
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			"error": "Podaj prawidłowy adres email",
+		})
+		return
+	}
+
+	// Blokada znanych śmieciowych domen
+	emailParts := strings.SplitN(strings.ToLower(email), "@", 2)
+	if len(emailParts) == 2 && blockedEmailDomains[emailParts[1]] {
+		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			"error": "Podany adres email nie jest dozwolony",
 		})
 		return
 	}
