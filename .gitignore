@@ -34,5 +34,4 @@ dist/
 *.log 
 
 push_to_github.sh
-restart.sh
 setup_server.sh
