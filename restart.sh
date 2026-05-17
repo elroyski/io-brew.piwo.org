@@ -1,9 +1,9 @@
 #!/bin/bash
-# Watchdog / restart skrypt dla ispindel.piwo.org
+# Watchdog / restart skrypt dla io-brew.piwo.org
 # Uruchamiaj przez cron co 5 minut:
-# */5 * * * * /bin/bash /home/piwo/domains/ispindel.piwo.org/restart.sh >> /home/piwo/domains/ispindel.piwo.org/watchdog.log 2>&1
+# */5 * * * * /bin/bash /home/piwo/domains/io-brew.piwo.org/restart.sh >> /home/piwo/domains/io-brew.piwo.org/watchdog.log 2>&1
 
-APP_DIR="/home/piwo/domains/ispindel.piwo.org/ispindel-app"
+APP_DIR="/home/piwo/domains/io-brew.piwo.org/ispindel-app"
 BINARY="${APP_DIR}/ispindel-app"
 PID_FILE="${APP_DIR}/app.pid"
 LOG_FILE="${APP_DIR}/app.log"
